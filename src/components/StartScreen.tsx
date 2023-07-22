@@ -1,4 +1,4 @@
-import { AppActions } from './App';
+import { AppActions } from '../App';
 
 interface StartScreenProps {
   numQuestions: number;
