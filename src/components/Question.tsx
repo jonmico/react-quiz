@@ -13,7 +13,6 @@ export default function Question({
   dispatch,
   answer,
 }: QuestionProps) {
-  console.log(question);
   return (
     <div>
       <h4>{question.question}</h4>
