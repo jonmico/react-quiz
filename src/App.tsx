@@ -6,6 +6,7 @@ import Loader from './components/Loader';
 import Error from './components/Error';
 import StartScreen from './components/StartScreen';
 import Question from './components/Question';
+import NextButton from './components/NextButton';
 
 interface AppState {
   questions: IQuestion[];
@@ -42,7 +43,16 @@ type NewAnswer = {
   payload: number;
 };
 
-export type AppActions = DataReceived | DataFailed | StartQuiz | NewAnswer;
+type NextQuestion = {
+  type: 'nextQuestion';
+};
+
+export type AppActions =
+  | DataReceived
+  | DataFailed
+  | StartQuiz
+  | NewAnswer
+  | NextQuestion;
 
 function reducer(state: AppState, action: AppActions) {
   switch (action.type) {
@@ -64,6 +74,8 @@ function reducer(state: AppState, action: AppActions) {
             : state.points,
       };
     }
+    case 'nextQuestion':
+      return { ...state, index: state.index++, answer: null };
     default:
       throw TypeError('Action unknown.');
   }
@@ -98,11 +110,14 @@ export default function App() {
           <StartScreen numQuestions={numQuestions} dispatch={dispatch} />
         )}
         {status === 'active' && (
-          <Question
-            question={questions[index]}
-            dispatch={dispatch}
-            answer={answer}
-          />
+          <>
+            <Question
+              question={questions[index]}
+              dispatch={dispatch}
+              answer={answer}
+            />
+            <NextButton dispatch={dispatch} answer={answer} />
+          </>
         )}
       </Main>
     </div>
