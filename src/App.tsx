@@ -1,4 +1,5 @@
 import { useEffect, useReducer } from 'react';
+import { IQuestion } from './interfaces/question.interface';
 import Header from './components/Header';
 import Main from './components/Main';
 import Loader from './components/Loader';
@@ -7,16 +8,20 @@ import StartScreen from './components/StartScreen';
 import Question from './components/Question';
 
 interface AppState {
-  questions: [];
+  questions: IQuestion[];
   // 'loading', 'error', 'ready', 'active', 'finished'
   status: string;
   index: number;
+  answer: null | number;
+  points: number;
 }
 
 const initialState: AppState = {
   questions: [],
   status: 'loading',
   index: 0,
+  answer: null,
+  points: 0,
 };
 
 type DataReceived = {
@@ -32,7 +37,12 @@ type StartQuiz = {
   type: 'start';
 };
 
-export type AppActions = DataReceived | DataFailed | StartQuiz;
+type NewAnswer = {
+  type: 'newAnswer';
+  payload: number;
+};
+
+export type AppActions = DataReceived | DataFailed | StartQuiz | NewAnswer;
 
 function reducer(state: AppState, action: AppActions) {
   switch (action.type) {
@@ -42,13 +52,25 @@ function reducer(state: AppState, action: AppActions) {
       return { ...state, status: 'error' };
     case 'start':
       return { ...state, status: 'active' };
+    case 'newAnswer': {
+      const question: IQuestion | undefined = state.questions.at(state.index);
+
+      return {
+        ...state,
+        answer: action.payload,
+        points:
+          action.payload === question?.correctOption
+            ? state.points + question?.points
+            : state.points,
+      };
+    }
     default:
-      throw new Error('Action unknown.');
+      throw TypeError('Action unknown.');
   }
 }
 
 export default function App() {
-  const [{ questions, status, index }, dispatch] = useReducer(
+  const [{ questions, status, index, answer }, dispatch] = useReducer(
     reducer,
     initialState
   );
@@ -75,7 +97,13 @@ export default function App() {
         {status === 'ready' && (
           <StartScreen numQuestions={numQuestions} dispatch={dispatch} />
         )}
-        {status === 'active' && <Question question={questions[index]} />}
+        {status === 'active' && (
+          <Question
+            question={questions[index]}
+            dispatch={dispatch}
+            answer={answer}
+          />
+        )}
       </Main>
     </div>
   );
