@@ -1,13 +1,17 @@
+import { AppActions } from '../App';
+
 interface FinishScreenProps {
   points: number;
   maxPossiblePoints: number;
   highScore: number;
+  dispatch: React.Dispatch<AppActions>;
 }
 
 export default function FinishScreen({
   points,
   maxPossiblePoints,
   highScore,
+  dispatch,
 }: FinishScreenProps) {
   const percentage = (points / maxPossiblePoints) * 100;
 
@@ -26,6 +30,12 @@ export default function FinishScreen({
         {Math.ceil(percentage)}%)
       </p>
       <p className='highscore'>(Highscore: {highScore} points)</p>
+      <button
+        className='btn btn-ui'
+        onClick={() => dispatch({ type: 'restart' })}
+      >
+        Restart Quiz
+      </button>
     </>
   );
 }

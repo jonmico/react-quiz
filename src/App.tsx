@@ -55,13 +55,18 @@ type Finished = {
   type: 'finish';
 };
 
+type Restart = {
+  type: 'restart';
+};
+
 export type AppActions =
   | DataReceived
   | DataFailed
   | StartQuiz
   | NewAnswer
   | NextQuestion
-  | Finished;
+  | Finished
+  | Restart;
 
 function reducer(state: AppState, action: AppActions) {
   switch (action.type) {
@@ -91,6 +96,14 @@ function reducer(state: AppState, action: AppActions) {
         status: 'finished',
         highScore:
           state.points > state.highScore ? state.points : state.highScore,
+      };
+    case 'restart':
+      return {
+        ...state,
+        status: 'ready',
+        index: 0,
+        answer: null,
+        points: 0,
       };
     default:
       throw TypeError('Action unknown.');
@@ -154,6 +167,7 @@ export default function App() {
             points={points}
             maxPossiblePoints={maxPossiblePoints}
             highScore={highScore}
+            dispatch={dispatch}
           />
         )}
       </Main>
